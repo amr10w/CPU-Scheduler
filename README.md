@@ -1,8 +1,4 @@
 
-
-Here's your complete `README.md`:
-
-```markdown
 # 🖥️ CPU Scheduler Simulator
 
 A GUI desktop application that simulates various CPU scheduling algorithms.
