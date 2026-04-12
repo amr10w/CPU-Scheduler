@@ -1,19 +1,14 @@
 from process import Process
+from base_scheduler import BaseScheduler
 
 
-class PriorityScheduler:
+class PriorityScheduler(BaseScheduler):
 
     def __init__(self, preemptive: bool = False):
+        super().__init__()
         self.preemptive = preemptive
-        self.processes: list[Process] = []
-        self.current_time = 0
-        self.current_process: Process | None = None
-        self.gantt_chart: list[dict] = []
+        
 
-    # ------------------------------------------------------------------
-
-    def add_process(self, process: Process):
-        self.processes.append(process)
 
     def _ready_queue(self):
         return sorted(
@@ -63,31 +58,8 @@ class PriorityScheduler:
             "remaining_times": {p.pid: p.remaining_time for p in self.processes if not p.is_completed},
         }
 
-    # ------------------------------------------------------------------
 
-    def run_all(self):
-        while any(not p.is_completed for p in self.processes):
-            # Advance time if all processes are in the future (avoid infinite loop)
-            if not self._ready_queue():
-                self.current_time += 1
-                continue
-            self.tick()
 
-    # ------------------------------------------------------------------
-
-    def average_waiting_time(self) -> float:
-        done = [p for p in self.processes if p.is_completed]
-        return sum(p.waiting_time for p in done) / len(done) if done else 0.0
-
-    def average_turnaround_time(self) -> float:
-        done = [p for p in self.processes if p.is_completed]
-        return sum(p.turnaround_time for p in done) / len(done) if done else 0.0
-
-    # ------------------------------------------------------------------
 
     def reset(self):
-        for p in self.processes:
-            p.reset()
-        self.current_time    = 0
-        self.current_process = None
-        self.gantt_chart     = []
+            self._base_reset() 
