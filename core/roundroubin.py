@@ -3,7 +3,7 @@ from process import Process
 from base_scheduler import BaseScheduler
 
 class RoundRobinScheduler(BaseScheduler):
-    def __init__(self, quantum):
+    def __init__(self, quantum=5):
         super().__init__()
         self.quantum = quantum
         self.ready_queue = deque()
