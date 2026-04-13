@@ -1,10 +1,1 @@
-# CPU Scheduler Simulator
-# =======================
-# This project uses only Python standard library (tkinter).
-# No external packages are required to run the application.
-#
-# Python 3.7+ required
-#
-# For building the executable:
-# pip install pyinstaller
-pyinstaller>=6.0
+# tkinter is included with Python (install python3-tk if missing)
