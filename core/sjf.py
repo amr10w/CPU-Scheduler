@@ -1,5 +1,5 @@
-from process import Process
-from base_scheduler import BaseScheduler
+from .process import Process
+from .base_scheduler import BaseScheduler
 
 
 class SJFScheduler(BaseScheduler):
@@ -53,7 +53,6 @@ class SJFScheduler(BaseScheduler):
             if finished:
                 self.current_process.completion_time = self.current_time + 1
                 self.current_process.calculate_times()
-                self.completed_processes.append(self.current_process)
 
         # Record Gantt entry
         self.gantt_chart.append({
@@ -66,7 +65,7 @@ class SJFScheduler(BaseScheduler):
         return {
             "time":    self.current_time - 1,
             "running": self.current_process.pid if self.current_process else None,
-            "remaining_times": {
+            "remaining": {
                 p.pid: p.remaining_time for p in self.processes if not p.is_completed
             },
         }

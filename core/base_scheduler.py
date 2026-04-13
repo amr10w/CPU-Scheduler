@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from process import Process
+from .process import Process
 
 class BaseScheduler(ABC):
     """

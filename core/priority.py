@@ -1,5 +1,5 @@
-from process import Process
-from base_scheduler import BaseScheduler
+from .process import Process
+from .base_scheduler import BaseScheduler
 
 
 class PriorityScheduler(BaseScheduler):
@@ -55,7 +55,7 @@ class PriorityScheduler(BaseScheduler):
         return {
             "time":    self.current_time - 1,
             "running": self.current_process.pid if self.current_process else None,
-            "remaining_times": {p.pid: p.remaining_time for p in self.processes if not p.is_completed},
+            "remaining": {p.pid: p.remaining_time for p in self.processes if not p.is_completed},
         }
 
 

@@ -1,5 +1,5 @@
-from process import Process
-from base_scheduler import BaseScheduler
+from .process import Process
+from .base_scheduler import BaseScheduler
 
 
 class Engine:

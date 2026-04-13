@@ -1,6 +1,6 @@
 from collections import deque
-from process import Process
-from base_scheduler import BaseScheduler
+from .process import Process
+from .base_scheduler import BaseScheduler
 
 class RoundRobinScheduler(BaseScheduler):
     def __init__(self, quantum=5):
@@ -44,6 +44,8 @@ class RoundRobinScheduler(BaseScheduler):
         self.time_in_quantum += 1
 
         # 5. Preemption/Completion Logic
+        current_pid = self.current_process.pid if self.current_process else "Idle"
+
         if finished:
             self.current_process.completion_time = self.current_time + 1  # Ends at end of this unit
             self.current_process.calculate_times()
@@ -58,14 +60,14 @@ class RoundRobinScheduler(BaseScheduler):
             self.current_process = None
 
         self.gantt_chart.append({
-            "pid":  self.current_process.pid if self.current_process else "Idle",
+            "pid":  current_pid,
             "time": self.current_time,
         })
         self.current_time += 1
         
         return {
             "time":      self.current_time - 1,
-            "running":   self.current_process.pid if self.current_process else None,
+            "running":   current_pid if current_pid != "Idle" else None,
             "remaining": {p.pid: p.remaining_time for p in self.processes if not p.is_completed},
         }
 
