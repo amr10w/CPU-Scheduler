@@ -26,6 +26,7 @@ class RoundRobinScheduler(BaseScheduler):
             if self.current_process.start_time == -1:
                 self.current_process.start_time = self.current_time
 
+        pid = self.current_process.pid
         finished = self.current_process.execute_one_unit()
         self.time_in_quantum += 1
 
@@ -42,7 +43,7 @@ class RoundRobinScheduler(BaseScheduler):
             self.current_process = None
 
         self.gantt_chart.append({
-            "pid": self.current_process.pid if self.current_process else "Idle",
+            "pid": pid,
             "time": self.current_time,
         })
         self.current_time += 1
