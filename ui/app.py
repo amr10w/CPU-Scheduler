@@ -60,6 +60,7 @@ class CPUSchedulerApp:
         self.scheduler = None
         self.sched_type_key = None
         self.is_live_running = False
+        self.is_paused = False
         self.sim_timer = None
         self.process_counter = 0
 
@@ -267,6 +268,14 @@ class CPUSchedulerApp:
             state=tk.DISABLED, **btn_style
         )
         self.stop_btn.pack(side=tk.LEFT, padx=5)
+
+        self.pause_btn = tk.Button(
+            frame, text="⏸  Pause",
+            command=self._toggle_pause,
+            bg="#FF9800", fg="white",
+            state=tk.DISABLED, **btn_style
+        )
+        self.pause_btn.pack(side=tk.LEFT, padx=5)
 
         self.add_btn = tk.Button(
             frame, text="➕  Add Process",
@@ -566,7 +575,7 @@ class CPUSchedulerApp:
         self._tick_live()
 
     def _tick_live(self):
-        if not self.is_live_running:
+        if not self.is_live_running or self.is_paused:
             return
         if self.scheduler.is_done():
             self._on_simulation_complete()
@@ -610,7 +619,23 @@ class CPUSchedulerApp:
             self.root.after_cancel(self.sim_timer)
             self.sim_timer = None
         self.is_live_running = False
+        self.is_paused = False
         self._set_buttons_running(False)
+
+    def _toggle_pause(self):
+        if self.is_paused:
+            self._resume_from_pause()
+        else:
+            self._pause_simulation()
+
+    def _pause_simulation(self):
+        self.is_paused = True
+        self.pause_btn.config(text="▶  Resume", bg="#4CAF50")
+
+    def _resume_from_pause(self):
+        self.is_paused = False
+        self.pause_btn.config(text="⏸  Pause", bg="#FF9800")
+        self._tick_live()
 
     def _on_simulation_complete(self):
         if self.sim_timer is not None:
@@ -782,11 +807,13 @@ class CPUSchedulerApp:
             self.start_btn.config(state=tk.DISABLED)
             self.instant_btn.config(state=tk.DISABLED)
             self.stop_btn.config(state=tk.NORMAL)
+            self.pause_btn.config(state=tk.NORMAL)
             self.scheduler_combo.config(state=tk.DISABLED)
         else:
             self.start_btn.config(state=tk.NORMAL)
             self.instant_btn.config(state=tk.NORMAL)
             self.stop_btn.config(state=tk.DISABLED)
+            self.pause_btn.config(state=tk.DISABLED, text="⏸  Pause", bg="#FF9800")
             self.scheduler_combo.config(state="readonly")
 
     def _reset_state(self):

@@ -94,6 +94,7 @@ class MainWindow:
         self.engine = None
         self.sim_timer = None
         self.is_playing = False
+        self.is_paused = False
         self.sim_speed = 1000
         self.pid_colors = {}
         self.color_idx = 0
@@ -477,6 +478,11 @@ class MainWindow:
                                   T["green_dark"], self._toggle_play)
         self.play_btn.pack(side=tk.LEFT, padx=6)
 
+        self.pause_btn = self._btn(center, "⏸  Pause", T["orange"],
+                                   T["orange_dark"], self._toggle_pause)
+        self.pause_btn.pack(side=tk.LEFT, padx=6)
+        self.pause_btn.configure(state=tk.DISABLED)
+
         self.step_btn = self._btn(center, "⏭  Step", T["accent"],
                                   T["accent_dark"], self._step_once)
         self.step_btn.pack(side=tk.LEFT, padx=6)
@@ -692,8 +698,10 @@ class MainWindow:
     def _play(self):
         if not self._ensure_engine(): return
         self.is_playing = True
-        self.play_btn.configure(text="⏸  Pause", bg=self.THEME["orange"],
-                                activebackground=self.THEME["orange_dark"])
+        self.is_paused = False
+        self.play_btn.configure(text="⏹  Stop", bg=self.THEME["red"],
+                                activebackground=self.THEME["red_dark"])
+        self.pause_btn.configure(state=tk.NORMAL)
         self._set_status("Running", self.THEME["green"])
         self._tick_loop()
 
@@ -702,14 +710,41 @@ class MainWindow:
         self.is_playing = False
         self.play_btn.configure(text="▶  Live Run", bg=self.THEME["green"],
                                 activebackground=self.THEME["green_dark"])
+        self.pause_btn.configure(state=tk.DISABLED)
+        self.is_paused = False
+        self._set_status("Stopped", self.THEME["yellow"])
+
+    def _toggle_pause(self):
+        if self.is_paused:
+            self._resume_from_pause()
+        else:
+            self._pause_simulation()
+
+    def _pause_simulation(self):
+        self._stop_timer()
+        self.is_paused = True
+        self.pause_btn.configure(text="▶  Resume", bg=self.THEME["green"],
+                                 activebackground=self.THEME["green_dark"])
         self._set_status("Paused", self.THEME["yellow"])
 
+    def _resume_from_pause(self):
+        self.is_paused = False
+        self.pause_btn.configure(text="⏸  Pause", bg=self.THEME["orange"],
+                                 activebackground=self.THEME["orange_dark"])
+        self._set_status("Running", self.THEME["green"])
+        self._tick_loop()
+
     def _tick_loop(self):
-        if not self.is_playing or self.engine is None: return
+    def _tick_loop(self):
+        if not self.is_playing or self.is_paused or self.engine is None: return
         if self.engine.is_done():
             self.is_playing = False
+            self.is_paused = False
             self.play_btn.configure(text="▶  Live Run", bg=self.THEME["green"],
                                     activebackground=self.THEME["green_dark"])
+            self.pause_btn.configure(text="⏸  Pause", bg=self.THEME["orange"],
+                                     activebackground=self.THEME["orange_dark"],
+                                     state=tk.DISABLED)
             self._set_status("Completed ✓", self.THEME["green"])
             self._update_dashboard()
             return
@@ -736,8 +771,10 @@ class MainWindow:
             messagebox.showwarning("Warning", "Add at least one process"); return
         self._stop_timer()
         self.is_playing = False
+        self.is_paused = False
         self.play_btn.configure(text="▶  Live Run", bg=self.THEME["green"],
                                 activebackground=self.THEME["green_dark"])
+        self.pause_btn.configure(state=tk.DISABLED)
         self.engine = self._build_engine()
         if self.engine is None: return
         self.pid_colors.clear()
@@ -755,8 +792,12 @@ class MainWindow:
     def _reset_sim(self):
         self._stop_timer()
         self.is_playing = False
+        self.is_paused = False
         self.play_btn.configure(text="▶  Live Run", bg=self.THEME["green"],
                                 activebackground=self.THEME["green_dark"])
+        self.pause_btn.configure(text="⏸  Pause", bg=self.THEME["orange"],
+                                 activebackground=self.THEME["orange_dark"],
+                                 state=tk.DISABLED)
         self.engine = None
         self.pid_colors.clear()
         self.color_idx = 0
